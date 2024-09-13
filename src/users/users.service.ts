@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, ServiceUnavailableException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateIngredientsDto, UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './entities/user.entity';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import * as bcrypt from 'bcrypt'
 import { UserRole } from './enums/rol.enum';
 
@@ -39,7 +39,7 @@ export class UsersService {
   async findById(_id) {
     const userSerch = await this.userModel.findById(_id)
     if (!userSerch) {
-      throw new UnauthorizedException(`el usuario con el id ${_id} no fue encontrado`)
+      throw new NotFoundException(`el usuario con el id ${_id} no fue encontrado`)
     }
     return userSerch;
   }
@@ -55,6 +55,19 @@ export class UsersService {
       throw new NotFoundException(`el usuario con el id ${_id} no fue encontrado`)
     }
     return `el usuario con el id ${_id} no fue encontrado`;
+  }
+
+  async listIngredients(_id:string) {
+    console.log(_id)
+    const user = await this.findById(_id)
+    return  user.ingredients
+  }
+
+
+  async updateIngredients(updateIngredientsDto:UpdateIngredientsDto) {
+    const user = await this.userModel.findById(updateIngredientsDto.user_id)
+    user.ingredients = updateIngredientsDto.ingredients
+    return await user.save()
   }
 
     //recoverypassword

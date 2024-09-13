@@ -1,7 +1,6 @@
 import { ObjectType, Field, Int, Float, ID, registerEnumType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { Stream } from 'stream';
 
 
 @ObjectType()
@@ -47,10 +46,14 @@ export class Recipe {
   @Prop({ type: [{ type: Ingredient }] })
   @Field(() => [Ingredient], {nullable: 'itemsAndList', description:'ingredients for recipe'})
   ingredients: Ingredient[];
-
+  
   @Prop()
+  @Field(() => String, {nullable:true, description:"url youtube"})
+
+  @Prop({index:true, ref:"User"})
   @Field(() => ID)
   user_id: Types.ObjectId
+
 
   @Prop()
   @Field(() => [String], {nullable:true})
@@ -63,16 +66,18 @@ export const RecipeSchema = SchemaFactory.createForClass(Recipe);
 
 
 export enum UnitOfMeasure {
-  GRAMS = 'gramos',
-  KILOGRAMS = 'kilos',
-  CUPS = 'tazas',
-  TABLESPOONS = 'cucharadas',
-  TEASPOONS = 'cucharaditas',
-  LITERS = 'litros',
-  MILLILITERS = 'mililitros',
-  UNITS = 'unidades',
-  PIECES = 'piezas'
+  GRAMS = 'Gramos',
+  KILOGRAMS = 'Kilos',
+  CUPS = 'Tazas',
+  TABLESPOONS = 'Cucharadas',
+  TEASPOONS = 'Cucharaditas',
+  LITERS = 'Litros',
+  MILLILITERS = 'Mililitros',
+  UNITS = 'Unidades',
+  PIECES = 'Piezas',
+  TO_TASTE = 'Al gusto'
 }
+
 
 registerEnumType(UnitOfMeasure, {
   name: 'UnitOfMeasure', // Este es el nombre que se usará en el schema GraphQL

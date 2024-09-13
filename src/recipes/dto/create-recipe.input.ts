@@ -30,9 +30,9 @@ export class CreateRecipeInput {
   @Field(() => ID, {nullable:false})
   user_id: Types.ObjectId
 
-  @IsNotEmpty()
-  @IsString()
-  @Field(() => String, { description: 'Title of the recipe' })
+  @IsNotEmpty({message:"El titulo no debe de estar vacio"})
+  @IsString({message: ""})
+  @Field(() => String, { description: 'Title of the recipe',})
   title: string;
 
   @IsNotEmpty()
@@ -47,6 +47,7 @@ export class CreateRecipeInput {
   @Field(() => [IngredientInput], { description: 'List of ingredients for the recipe' })
   ingredients: IngredientInput[];
 
+  @IsOptional()
   @IsArray()
   @Transform(({ value }) => {
     if (typeof value === 'string') {
@@ -58,6 +59,9 @@ export class CreateRecipeInput {
     }
     return value;
   })
+
+
+  @IsOptional()
   @Field(() => [String], { description: 'tags' })
   tags: string[];
 
