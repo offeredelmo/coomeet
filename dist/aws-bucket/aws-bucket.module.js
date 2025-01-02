@@ -6,18 +6,17 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ImagesModule = void 0;
+exports.AwsBucketModule = void 0;
 const common_1 = require("@nestjs/common");
-const images_service_1 = require("./images.service");
-const images_controller_1 = require("./images.controller");
-let ImagesModule = class ImagesModule {
+const aws_bucket_service_1 = require("./aws-bucket.service");
+let AwsBucketModule = class AwsBucketModule {
 };
-exports.ImagesModule = ImagesModule;
-exports.ImagesModule = ImagesModule = __decorate([
+exports.AwsBucketModule = AwsBucketModule;
+exports.AwsBucketModule = AwsBucketModule = __decorate([
     (0, common_1.Module)({
-        controllers: [images_controller_1.ImagesController],
-        providers: [images_service_1.ImagesService],
-        exports: [images_service_1.ImagesService],
+        controllers: [],
+        providers: [aws_bucket_service_1.AwsBucketService],
+        exports: [aws_bucket_service_1.AwsBucketService]
     })
-], ImagesModule);
-//# sourceMappingURL=images.module.js.map
+], AwsBucketModule);
+//# sourceMappingURL=aws-bucket.module.js.map

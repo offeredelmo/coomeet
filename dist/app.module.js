@@ -16,22 +16,14 @@ const config_1 = require("@nestjs/config");
 const nodemailer_module_1 = require("./nodemailer/nodemailer.module");
 const configuration_1 = require("./config/configuration");
 const mailer_1 = require("@nestjs-modules/mailer");
-const graphql_1 = require("@nestjs/graphql");
-const apollo_1 = require("@nestjs/apollo");
 const recipes_module_1 = require("./recipes/recipes.module");
-const images_module_1 = require("./images/images.module");
+const aws_bucket_module_1 = require("./aws-bucket/aws-bucket.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            graphql_1.GraphQLModule.forRoot({
-                driver: apollo_1.ApolloDriver,
-                autoSchemaFile: true,
-                playground: true,
-                csrfPrevention: false,
-            }),
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
                 load: [configuration_1.default],
@@ -63,7 +55,7 @@ exports.AppModule = AppModule = __decorate([
             auth_module_1.AuthModule,
             nodemailer_module_1.NodemailerModule,
             recipes_module_1.RecipesModule,
-            images_module_1.ImagesModule
+            aws_bucket_module_1.AwsBucketModule,
         ],
         controllers: [],
         providers: [auth_service_1.AuthService],

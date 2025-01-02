@@ -9,16 +9,31 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpdateRecipeInput = void 0;
-const mongoose_1 = require("mongoose");
-const create_recipe_input_1 = require("./create-recipe.input");
+exports.UploadFileDto = exports.CreateAwsBucketDto = void 0;
 const class_validator_1 = require("class-validator");
-const mapped_types_1 = require("@nestjs/mapped-types");
-class UpdateRecipeInput extends (0, mapped_types_1.PartialType)(create_recipe_input_1.CreateRecipeInput) {
+class CreateAwsBucketDto {
 }
-exports.UpdateRecipeInput = UpdateRecipeInput;
+exports.CreateAwsBucketDto = CreateAwsBucketDto;
+class UploadFileDto {
+    constructor(bucketName, key, body) {
+        this.bucketName = bucketName;
+        this.key = key;
+        this.body = body;
+    }
+}
+exports.UploadFileDto = UploadFileDto;
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", mongoose_1.Types.ObjectId)
-], UpdateRecipeInput.prototype, "_id", void 0);
-//# sourceMappingURL=update-recipe.input.js.map
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UploadFileDto.prototype, "bucketName", void 0);
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UploadFileDto.prototype, "key", void 0);
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", Object)
+], UploadFileDto.prototype, "body", void 0);
+//# sourceMappingURL=create-aws-bucket.dto.js.map

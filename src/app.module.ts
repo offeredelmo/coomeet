@@ -7,21 +7,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { NodemailerModule } from './nodemailer/nodemailer.module';
 import configuration from './config/configuration';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { RecipesModule } from './recipes/recipes.module';
-import { ImagesModule } from './images/images.module';
+import { AwsBucketModule } from './aws-bucket/aws-bucket.module';
 
 @Module({
   imports: [
-
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      autoSchemaFile: true,
-      playground: true,
-      csrfPrevention: false,
-    }),
-
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
@@ -32,19 +22,17 @@ import { ImagesModule } from './images/images.module';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => (
         {
-        transport : {
-          host: configService.get<string>('email_host'),
-          port: configService.get<number>('email_port'),
-          secure: true,
-          auth: {
-            user: configService.get<string>('auth_user'),
-            pass: configService.get<string>('auth_pass'),
-          },
-        }
-      }),
-
+          transport: {
+            host: configService.get<string>('email_host'),
+            port: configService.get<number>('email_port'),
+            secure: true,
+            auth: {
+              user: configService.get<string>('auth_user'),
+              pass: configService.get<string>('auth_pass'),
+            },
+          }
+        }),
       inject: [ConfigService],
-
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -57,9 +45,9 @@ import { ImagesModule } from './images/images.module';
     AuthModule,
     NodemailerModule,
     RecipesModule,
-    ImagesModule
+    AwsBucketModule,
   ],
   controllers: [],
   providers: [AuthService],
 })
-export class AppModule {}
+export class AppModule { }

@@ -1,6 +1,7 @@
+import { Types } from 'mongoose';
 import { CreateRecipeInput } from './create-recipe.input';
-declare const UpdateRecipeInput_base: import("@nestjs/common").Type<Partial<CreateRecipeInput>>;
+declare const UpdateRecipeInput_base: import("@nestjs/mapped-types").MappedType<Partial<CreateRecipeInput>>;
 export declare class UpdateRecipeInput extends UpdateRecipeInput_base {
-    id: number;
+    _id: Types.ObjectId;
 }
 export {};

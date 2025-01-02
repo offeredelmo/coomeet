@@ -7,8 +7,8 @@ import { HydratedDocument, Types } from 'mongoose';
 @Schema()
 export class Ingredient {
 
-  @Prop({required:true})
-  @Field(() => String, {nullable: false})
+  @Prop({ required: true })
+  @Field(() => String, { nullable: false })
   name: string;
 
   @Prop()
@@ -26,39 +26,39 @@ export type IngredientDocument = HydratedDocument<Ingredient>;
 
 
 @ObjectType()
-@Schema()
+@Schema({ timestamps: true })
 export class Recipe {
-  @Field(() => ID)
   _id: Types.ObjectId;
 
-  @Prop({required: true})
-  @Field(() => String, {nullable: false, description: 'title recipe' })
+  @Prop({ required: true })
   title: string;
 
   @Prop()
-  @Field(() => String, {nullable: true, description: 'url image'})
   img_url?: string;
 
   @Prop()
-  @Field(() => String, {nullable: true, description: 'preparation instructions'})
-  preparation?: string;
+  key_img_url?: string;
+
+  @Prop()
+  preparation: string[];
 
   @Prop({ type: [{ type: Ingredient }] })
-  @Field(() => [Ingredient], {nullable: 'itemsAndList', description:'ingredients for recipe'})
   ingredients: Ingredient[];
-  
-  @Prop()
-  @Field(() => String, {nullable:true, description:"url youtube"})
 
-  @Prop({index:true, ref:"User"})
-  @Field(() => ID)
+  @Prop()
+  url_youtube: string
+
+  @Prop({ index: true, ref: "User" })
   user_id: Types.ObjectId
 
-
   @Prop()
-  @Field(() => [String], {nullable:true})
   tags: string[]
 
+  @Prop()
+  approved: boolean
+
+  @Prop()
+  delete: boolean
 }
 
 export type RecipeDocument = HydratedDocument<Recipe>;
@@ -66,16 +66,18 @@ export const RecipeSchema = SchemaFactory.createForClass(Recipe);
 
 
 export enum UnitOfMeasure {
-  GRAMS = 'Gramos',
-  KILOGRAMS = 'Kilos',
-  CUPS = 'Tazas',
-  TABLESPOONS = 'Cucharadas',
-  TEASPOONS = 'Cucharaditas',
-  LITERS = 'Litros',
-  MILLILITERS = 'Mililitros',
-  UNITS = 'Unidades',
-  PIECES = 'Piezas',
-  TO_TASTE = 'Al gusto'
+  GRAMS = 'gramo',
+  KILOGRAMS = 'kilos',
+  CUPS = 'taza',
+  TABLESPOONS = 'cucharada',
+  TEASPOONS = 'cucharadita',
+  LITERS = 'litro',
+  MILLILITERS = 'mililitro',
+  PIECES = 'pieza',
+  TO_TASTE = 'algusto',
+  PINCH = 'pisca',
+  QUARTER = 'cuarto',
+  HALF = 'mitad',
 }
 
 

@@ -9,8 +9,10 @@ export declare class Recipe {
     _id: Types.ObjectId;
     title: string;
     img_url?: string;
-    preparation?: string;
+    key_img_url?: string;
+    preparation: string[];
     ingredients: Ingredient[];
+    url_youtube: string;
     user_id: Types.ObjectId;
     tags: string[];
 }
@@ -21,14 +23,16 @@ export declare const RecipeSchema: import("mongoose").Schema<Recipe, import("mon
     _id: Types.ObjectId;
 }>>;
 export declare enum UnitOfMeasure {
-    GRAMS = "Gramos",
-    KILOGRAMS = "Kilos",
-    CUPS = "Tazas",
-    TABLESPOONS = "Cucharadas",
-    TEASPOONS = "Cucharaditas",
-    LITERS = "Litros",
-    MILLILITERS = "Mililitros",
-    UNITS = "Unidades",
-    PIECES = "Piezas",
-    TO_TASTE = "Al gusto"
+    GRAMS = "gramo",
+    KILOGRAMS = "kilos",
+    CUPS = "taza",
+    TABLESPOONS = "cucharada",
+    TEASPOONS = "cucharadita",
+    LITERS = "litro",
+    MILLILITERS = "mililitro",
+    PIECES = "pieza",
+    TO_TASTE = "algusto",
+    PINCH = "pisca",
+    QUARTER = "cuarto",
+    HALF = "mitad"
 }

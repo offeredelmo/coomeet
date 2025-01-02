@@ -8,8 +8,9 @@ declare class IngredientInput {
 export declare class CreateRecipeInput {
     user_id: Types.ObjectId;
     title: string;
-    preparation?: string;
+    preparation?: string[];
     ingredients: IngredientInput[];
+    url_youtube: string;
     tags: string[];
 }
 export {};

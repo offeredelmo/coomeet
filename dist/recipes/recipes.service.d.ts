@@ -1,23 +1,28 @@
 import { CreateRecipeInput } from './dto/create-recipe.input';
-import { ImagesService } from 'src/images/images.service';
 import { Recipe } from './entities/recipe.entity';
 import { Model, Types } from 'mongoose';
 import { UsersService } from 'src/users/users.service';
 import { PaginationDTO } from 'src/config/pagination.dto';
 import { ReviewRecipe } from './entities/reviewRecipe.entity';
 import { CreateReviewInput } from './dto/create-review.input';
+import { AwsBucketService } from 'src/aws-bucket/aws-bucket.service';
+import { UpdateRecipeInput } from './dto/update-recipe.input';
 export declare class RecipesService {
     private recipeModel;
     private recipeReviewModel;
-    private readonly imagesService;
+    private readonly awsBucketService;
     private readonly usersService;
-    constructor(recipeModel: Model<Recipe>, recipeReviewModel: Model<ReviewRecipe>, imagesService: ImagesService, usersService: UsersService);
+    constructor(recipeModel: Model<Recipe>, recipeReviewModel: Model<ReviewRecipe>, awsBucketService: AwsBucketService, usersService: UsersService);
     findById(_id: any): Promise<import("mongoose").Document<unknown, {}, Recipe> & Recipe & Required<{
         _id: Types.ObjectId;
     }>>;
-    createRecipe(createRecipeInput: CreateRecipeInput, file: Express.Multer.File): Promise<import("mongoose").Document<unknown, {}, Recipe> & Recipe & Required<{
+    createRecipe(createRecipeInput: CreateRecipeInput): Promise<import("mongoose").Document<unknown, {}, Recipe> & Recipe & Required<{
         _id: Types.ObjectId;
     }>>;
+    updateRecipe(updateRecipeInput: UpdateRecipeInput): Promise<import("mongoose").Document<unknown, {}, Recipe> & Recipe & Required<{
+        _id: Types.ObjectId;
+    }>>;
+    addImgeToImage(_id: string, file: Express.Multer.File): Promise<any>;
     getRecipe(_id: string): Promise<import("mongoose").Document<unknown, {}, Recipe> & Recipe & Required<{
         _id: Types.ObjectId;
     }>>;
@@ -26,5 +31,6 @@ export declare class RecipesService {
     reviewRecipe(createReviewInput: CreateReviewInput): Promise<import("mongoose").Document<unknown, {}, ReviewRecipe> & ReviewRecipe & {
         _id: Types.ObjectId;
     }>;
-    validateRecipe(recipe: Recipe): Promise<void>;
+    listRecipeByTag(tag: string): Promise<any[]>;
+    search(text: string): Promise<any[]>;
 }

@@ -7,11 +7,9 @@ import mongoose, { HydratedDocument, Types } from "mongoose";
 @Schema()
 export class Time {
   @Prop()
-  @Field(() => Number)
   hours: number;
 
   @Prop()
-  @Field(() => Number)
   minutes: number;
 }
 
@@ -23,15 +21,12 @@ export type IngredientDocument = HydratedDocument<Time>;
 @Schema()
 export class ReviewRecipe {
   @Prop({ type: mongoose.Types.ObjectId, ref: 'User', index:true,})
-  @Field(() => ID)
   user_id: mongoose.Types.ObjectId;
 
   @Prop({ type: mongoose.Types.ObjectId, ref: 'Recipe', index:true})
-  @Field(() => ID)
   recipe_id: mongoose.Types.ObjectId;
 
   @Prop()
-  @Field(() => Time)
   time: Time
 }
 

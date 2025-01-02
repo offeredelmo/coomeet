@@ -12,10 +12,10 @@ const recipes_service_1 = require("./recipes.service");
 const recipes_resolver_1 = require("./recipes.resolver");
 const mongoose_1 = require("@nestjs/mongoose");
 const recipe_entity_1 = require("./entities/recipe.entity");
-const images_module_1 = require("../images/images.module");
 const recipe_controller_1 = require("./recipe.controller");
 const users_module_1 = require("../users/users.module");
 const reviewRecipe_entity_1 = require("./entities/reviewRecipe.entity");
+const aws_bucket_module_1 = require("../aws-bucket/aws-bucket.module");
 let RecipesModule = class RecipesModule {
 };
 exports.RecipesModule = RecipesModule;
@@ -26,8 +26,8 @@ exports.RecipesModule = RecipesModule = __decorate([
                 { name: recipe_entity_1.Recipe.name, schema: recipe_entity_1.RecipeSchema },
                 { name: reviewRecipe_entity_1.ReviewRecipe.name, schema: reviewRecipe_entity_1.ReviewRecipeSchema }
             ]),
-            images_module_1.ImagesModule,
-            users_module_1.UsersModule
+            users_module_1.UsersModule,
+            aws_bucket_module_1.AwsBucketModule
         ],
         controllers: [recipe_controller_1.RecipeController],
         providers: [recipes_resolver_1.RecipesResolver, recipes_service_1.RecipesService],

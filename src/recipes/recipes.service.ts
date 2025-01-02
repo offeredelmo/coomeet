@@ -1,23 +1,25 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRecipeInput } from './dto/create-recipe.input';
-import { ImagesService } from 'src/images/images.service';
 import { InjectModel } from '@nestjs/mongoose';
-import { Ingredient, Recipe } from './entities/recipe.entity';
+import { Recipe } from './entities/recipe.entity';
 import { Model, Types } from 'mongoose';
 import { UsersService } from 'src/users/users.service';
 import { PaginationDTO } from 'src/config/pagination.dto';
 import { NotFoundError } from 'rxjs';
 import { ReviewRecipe } from './entities/reviewRecipe.entity';
 import { CreateReviewInput } from './dto/create-review.input';
-import { forbiddenWords } from 'src/utils/forbidenWords';
-
-
+import { AwsBucketService } from 'src/aws-bucket/aws-bucket.service';
+import { v4 as uuidv4 } from 'uuid';
+import { UploadFileDto } from 'src/aws-bucket/dto/create-aws-bucket.dto';
+import { ObjectId } from "mongodb";
+import { match } from 'assert';
+import { UpdateRecipeInput } from './dto/update-recipe.input';
 @Injectable()
 export class RecipesService {
   constructor(
     @InjectModel(Recipe.name) private recipeModel: Model<Recipe>,
     @InjectModel(ReviewRecipe.name) private recipeReviewModel: Model<ReviewRecipe>,
-    private readonly imagesService: ImagesService,
+    private readonly awsBucketService: AwsBucketService,
     private readonly usersService: UsersService
 
   ) { }
@@ -30,19 +32,63 @@ export class RecipesService {
     return recipe
   }
 
-  async createRecipe(createRecipeInput: CreateRecipeInput, file: Express.Multer.File) {
-
+  async createRecipe(createRecipeInput: CreateRecipeInput) {
     const newRecipe = new this.recipeModel(createRecipeInput)
-
     await this.usersService.findById(createRecipeInput.user_id)
-
-    if (file) {
-      const img_url = await this.imagesService.uploadFile(file)
-      newRecipe.img_url = img_url
-    }
-
+    newRecipe.user_id = new ObjectId(newRecipe.user_id)
     console.log(newRecipe.save)
     return await newRecipe.save()
+  }
+
+  async updateRecipe(updateRecipeInput: UpdateRecipeInput) {
+    try {
+      console.log()
+      const updateRecipe = await this.recipeModel.findOneAndUpdate(
+        { _id: new ObjectId(updateRecipeInput._id) },
+        {
+          $set: updateRecipeInput
+        },
+        {
+          new: true
+        }
+      )
+      console.log(updateRecipe)
+      return updateRecipe;
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  async addImgeToImage(_id: string, file: Express.Multer.File) {
+    try {
+      console.log(_id)
+      console.log("hola")
+      const fileExtension = file.originalname.split(".").pop();
+      const keyNameUrlImg = `${_id}.${fileExtension}`
+      const urlImage = await this.awsBucketService.uploadImageAndReturnUrl(
+        new UploadFileDto(
+          "doc-preuba-01-117",
+          `users/recipe/img/${keyNameUrlImg}`,
+          file.buffer,
+        )
+      ).catch((err) => {
+        console.error("Error uploading file to AWS:", err);
+        throw new Error("File upload failed");
+      });
+      await this.recipeModel.findByIdAndUpdate(
+        { _id: new ObjectId(_id) },
+        {
+          $set: { "img_url": `${urlImage.Location}`, "key_img_url": `${urlImage.key}` }
+        },
+        { new: true }
+      )
+      return urlImage;
+    } catch (error) {
+      console.error("Error in addImgeToImage:", error.message);
+      throw new Error("Failed to add image to recipe. Please try again.");
+    }
+
+
   }
 
   async getRecipe(_id: string) {
@@ -54,7 +100,7 @@ export class RecipesService {
       }
     ).exec();
     if (!recipe) {
-      throw new NotFoundError("No se a encontrado la receta")
+      throw new NotFoundException("No se a encontrado la receta")
     }
     return recipe
   }
@@ -156,15 +202,50 @@ export class RecipesService {
     console.log(newReview)
     return newReview.save()
   }
-  async validateRecipe(recipe: Recipe) {
 
-      const words = recipe.preparation.toLowerCase().split(/\s+/);
-      const wordsforbiden = words.some(word => forbiddenWords.has(word));
-      console.log(wordsforbiden)
-
-
-   
-
+  async listRecipeByTag(tag: string) {
+    try {
+      const recipes = await this.recipeModel.aggregate(
+        [
+          {
+            '$match': {
+              'tags': tag
+            }
+          }
+        ]
+      )
+      return recipes
+    } catch (error) {
+      throw new HttpException('Error server', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
+  async search(text: string) {
+    try {
+
+      if (!text) {
+        return []
+      }
+      console.log(text)
+      const arraytext: string[] = text.split(" ");
+      const recipes = await this.recipeModel.aggregate([
+        {
+          '$match': {
+            '$or': [
+              { 'tags': { '$in': arraytext } },
+              { 'title': { '$regex': text, '$options': 'i' } }, // Coincidencias parciales en el título
+            ]
+          }
+        }
+      ]);
+      return recipes;
+    } catch (error) {
+      console.error("Error en la búsqueda:", error.message);
+      throw new Error("No se pudo realizar la búsqueda");
+    }
+  }
+
+
 }
+
+

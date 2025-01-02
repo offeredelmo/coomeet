@@ -1,0 +1,1 @@
+{"version":3,"file":"aws-bucket.module.js","sourceRoot":"","sources":["../../src/aws-bucket/aws-bucket.module.ts"],"names":[],"mappings":";;;;;;;;;AAAA,2CAAwC;AACxC,6DAAwD;AAOjD,IAAM,eAAe,GAArB,MAAM,eAAe;CAAG,CAAA;AAAlB,0CAAe;0BAAf,eAAe;IAL3B,IAAA,eAAM,EAAC;QACN,WAAW,EAAE,EAAE;QACf,SAAS,EAAE,CAAC,qCAAgB,CAAC;QAC7B,OAAO,EAAE,CAAC,qCAAgB,CAAC;KAC5B,CAAC;GACW,eAAe,CAAG"}

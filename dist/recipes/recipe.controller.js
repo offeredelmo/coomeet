@@ -19,12 +19,21 @@ const platform_express_1 = require("@nestjs/platform-express");
 const create_recipe_input_1 = require("./dto/create-recipe.input");
 const pagination_dto_1 = require("../config/pagination.dto");
 const create_review_input_1 = require("./dto/create-review.input");
+const update_recipe_input_1 = require("./dto/update-recipe.input");
 let RecipeController = class RecipeController {
     constructor(recipesService) {
         this.recipesService = recipesService;
     }
-    async createRecipe(createRecipeInput, file) {
-        return await this.recipesService.createRecipe(createRecipeInput, file);
+    async createRecipe(createRecipeInput) {
+        console.log("entre en el metodo");
+        return await this.recipesService.createRecipe(createRecipeInput);
+    }
+    async updateRecipe(updateRecipeInput) {
+        return await this.recipesService.updateRecipe(updateRecipeInput);
+    }
+    async addImgeToImage(_id, file) {
+        console.log("entrooo");
+        return await this.recipesService.addImgeToImage(_id, file);
     }
     async getRecipe(id) {
         return await this.recipesService.getRecipe(id);
@@ -33,8 +42,14 @@ let RecipeController = class RecipeController {
         console.log(params);
         return await this.recipesService.listMyRecipes(params.id, params.page, params.page);
     }
+    async search(text) {
+        return await this.recipesService.search(text);
+    }
     async listRecipeRandom(paginationDTO) {
         return await this.recipesService.listRecipeRandom(paginationDTO);
+    }
+    async listRecipeByTag(tag) {
+        return await this.recipesService.listRecipeByTag(tag);
     }
     async reviewRecipe(createReviewInput) {
         return await this.recipesService.reviewRecipe(createReviewInput);
@@ -42,16 +57,30 @@ let RecipeController = class RecipeController {
 };
 exports.RecipeController = RecipeController;
 __decorate([
-    (0, common_1.Post)(),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
+    (0, common_1.Post)("/add"),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_recipe_input_1.CreateRecipeInput, Object]),
+    __metadata("design:paramtypes", [create_recipe_input_1.CreateRecipeInput]),
     __metadata("design:returntype", Promise)
 ], RecipeController.prototype, "createRecipe", null);
 __decorate([
-    (0, common_1.Get)("info/:id"),
+    (0, common_1.Patch)("/update"),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [update_recipe_input_1.UpdateRecipeInput]),
+    __metadata("design:returntype", Promise)
+], RecipeController.prototype, "updateRecipe", null);
+__decorate([
+    (0, common_1.Post)("/add-photo"),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
+    __param(0, (0, common_1.Body)("_id")),
+    __param(1, (0, common_1.UploadedFile)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], RecipeController.prototype, "addImgeToImage", null);
+__decorate([
+    (0, common_1.Get)("recipe/:id"),
     __param(0, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -65,12 +94,26 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], RecipeController.prototype, "listMyRecipes", null);
 __decorate([
+    (0, common_1.Get)("/search/"),
+    __param(0, (0, common_1.Body)("text")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], RecipeController.prototype, "search", null);
+__decorate([
     (0, common_1.Get)("/random"),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [pagination_dto_1.PaginationDTO]),
     __metadata("design:returntype", Promise)
 ], RecipeController.prototype, "listRecipeRandom", null);
+__decorate([
+    (0, common_1.Get)("/tag/"),
+    __param(0, (0, common_1.Query)("tag")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], RecipeController.prototype, "listRecipeByTag", null);
 __decorate([
     (0, common_1.Post)("review"),
     __param(0, (0, common_1.Body)()),

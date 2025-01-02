@@ -20,18 +20,15 @@ let IngredientInput = class IngredientInput {
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsString)(),
-    (0, graphql_1.Field)(() => String),
     __metadata("design:type", String)
 ], IngredientInput.prototype, "name", void 0);
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsOptional)(),
-    (0, graphql_1.Field)(() => graphql_1.Float),
     __metadata("design:type", Number)
 ], IngredientInput.prototype, "quantity", void 0);
 __decorate([
     (0, class_validator_1.IsEnum)(recipe_entity_1.UnitOfMeasure),
-    (0, graphql_1.Field)(() => recipe_entity_1.UnitOfMeasure),
     __metadata("design:type", String)
 ], IngredientInput.prototype, "unit", void 0);
 IngredientInput = __decorate([
@@ -43,29 +40,31 @@ exports.CreateRecipeInput = CreateRecipeInput;
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsMongoId)(),
-    (0, graphql_1.Field)(() => graphql_1.ID, { nullable: false }),
     __metadata("design:type", mongoose_1.Types.ObjectId)
 ], CreateRecipeInput.prototype, "user_id", void 0);
 __decorate([
     (0, class_validator_1.IsNotEmpty)({ message: "El titulo no debe de estar vacio" }),
     (0, class_validator_1.IsString)({ message: "" }),
-    (0, graphql_1.Field)(() => String, { description: 'Title of the recipe', }),
     __metadata("design:type", String)
 ], CreateRecipeInput.prototype, "title", void 0);
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.IsString)(),
-    (0, graphql_1.Field)(() => String, { nullable: true, description: 'Preparation instructions' }),
-    __metadata("design:type", String)
+    (0, class_validator_1.IsArray)(),
+    __metadata("design:type", Array)
 ], CreateRecipeInput.prototype, "preparation", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.ValidateNested)(),
     (0, class_validator_1.IsArray)(),
     (0, class_transformer_1.Type)(() => IngredientInput),
-    (0, graphql_1.Field)(() => [IngredientInput], { description: 'List of ingredients for the recipe' }),
     __metadata("design:type", Array)
 ], CreateRecipeInput.prototype, "ingredients", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateRecipeInput.prototype, "url_youtube", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsArray)(),
@@ -81,7 +80,6 @@ __decorate([
         return value;
     }),
     (0, class_validator_1.IsOptional)(),
-    (0, graphql_1.Field)(() => [String], { description: 'tags' }),
     __metadata("design:type", Array)
 ], CreateRecipeInput.prototype, "tags", void 0);
 exports.CreateRecipeInput = CreateRecipeInput = __decorate([

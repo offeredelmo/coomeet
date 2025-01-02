@@ -1,8 +1,9 @@
+import { Types } from 'mongoose';
 import { CreateRecipeInput } from './create-recipe.input';
-import { InputType, Field, Int, PartialType } from '@nestjs/graphql';
+import { IsNotEmpty } from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
 
-@InputType()
 export class UpdateRecipeInput extends PartialType(CreateRecipeInput) {
-  @Field(() => Int)
-  id: number;
+  @IsNotEmpty()
+  _id: Types.ObjectId;
 }

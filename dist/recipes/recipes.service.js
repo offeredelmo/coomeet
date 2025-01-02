@@ -14,19 +14,19 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RecipesService = void 0;
 const common_1 = require("@nestjs/common");
-const images_service_1 = require("../images/images.service");
 const mongoose_1 = require("@nestjs/mongoose");
 const recipe_entity_1 = require("./entities/recipe.entity");
 const mongoose_2 = require("mongoose");
 const users_service_1 = require("../users/users.service");
-const rxjs_1 = require("rxjs");
 const reviewRecipe_entity_1 = require("./entities/reviewRecipe.entity");
-const forbidenWords_1 = require("../utils/forbidenWords");
+const aws_bucket_service_1 = require("../aws-bucket/aws-bucket.service");
+const create_aws_bucket_dto_1 = require("../aws-bucket/dto/create-aws-bucket.dto");
+const mongodb_1 = require("mongodb");
 let RecipesService = class RecipesService {
-    constructor(recipeModel, recipeReviewModel, imagesService, usersService) {
+    constructor(recipeModel, recipeReviewModel, awsBucketService, usersService) {
         this.recipeModel = recipeModel;
         this.recipeReviewModel = recipeReviewModel;
-        this.imagesService = imagesService;
+        this.awsBucketService = awsBucketService;
         this.usersService = usersService;
     }
     async findById(_id) {
@@ -36,15 +36,47 @@ let RecipesService = class RecipesService {
         }
         return recipe;
     }
-    async createRecipe(createRecipeInput, file) {
+    async createRecipe(createRecipeInput) {
         const newRecipe = new this.recipeModel(createRecipeInput);
         await this.usersService.findById(createRecipeInput.user_id);
-        if (file) {
-            const img_url = await this.imagesService.uploadFile(file);
-            newRecipe.img_url = img_url;
-        }
+        newRecipe.user_id = new mongodb_1.ObjectId(newRecipe.user_id);
         console.log(newRecipe.save);
         return await newRecipe.save();
+    }
+    async updateRecipe(updateRecipeInput) {
+        try {
+            console.log();
+            const updateRecipe = await this.recipeModel.findOneAndUpdate({ _id: new mongodb_1.ObjectId(updateRecipeInput._id) }, {
+                $set: updateRecipeInput
+            }, {
+                new: true
+            });
+            console.log(updateRecipe);
+            return updateRecipe;
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+    async addImgeToImage(_id, file) {
+        try {
+            console.log(_id);
+            console.log("hola");
+            const fileExtension = file.originalname.split(".").pop();
+            const keyNameUrlImg = `${_id}.${fileExtension}`;
+            const urlImage = await this.awsBucketService.uploadImageAndReturnUrl(new create_aws_bucket_dto_1.UploadFileDto("doc-preuba-01-117", `users/recipe/img/${keyNameUrlImg}`, file.buffer)).catch((err) => {
+                console.error("Error uploading file to AWS:", err);
+                throw new Error("File upload failed");
+            });
+            await this.recipeModel.findByIdAndUpdate({ _id: new mongodb_1.ObjectId(_id) }, {
+                $set: { "img_url": `${urlImage.Location}`, "key_img_url": `${urlImage.key}` }
+            }, { new: true });
+            return urlImage;
+        }
+        catch (error) {
+            console.error("Error in addImgeToImage:", error.message);
+            throw new Error("Failed to add image to recipe. Please try again.");
+        }
     }
     async getRecipe(_id) {
         const recipe = await this.recipeModel.findById(_id).populate({
@@ -53,7 +85,7 @@ let RecipesService = class RecipesService {
             select: "_id userName"
         }).exec();
         if (!recipe) {
-            throw new rxjs_1.NotFoundError("No se a encontrado la receta");
+            throw new common_1.NotFoundException("No se a encontrado la receta");
         }
         return recipe;
     }
@@ -147,10 +179,44 @@ let RecipesService = class RecipesService {
         console.log(newReview);
         return newReview.save();
     }
-    async validateRecipe(recipe) {
-        const words = recipe.preparation.toLowerCase().split(/\s+/);
-        const wordsforbiden = words.some(word => forbidenWords_1.forbiddenWords.has(word));
-        console.log(wordsforbiden);
+    async listRecipeByTag(tag) {
+        try {
+            const recipes = await this.recipeModel.aggregate([
+                {
+                    '$match': {
+                        'tags': tag
+                    }
+                }
+            ]);
+            return recipes;
+        }
+        catch (error) {
+            throw new common_1.HttpException('Error server', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async search(text) {
+        try {
+            if (!text) {
+                return [];
+            }
+            console.log(text);
+            const arraytext = text.split(" ");
+            const recipes = await this.recipeModel.aggregate([
+                {
+                    '$match': {
+                        '$or': [
+                            { 'tags': { '$in': arraytext } },
+                            { 'title': { '$regex': text, '$options': 'i' } },
+                        ]
+                    }
+                }
+            ]);
+            return recipes;
+        }
+        catch (error) {
+            console.error("Error en la búsqueda:", error.message);
+            throw new Error("No se pudo realizar la búsqueda");
+        }
     }
 };
 exports.RecipesService = RecipesService;
@@ -160,7 +226,7 @@ exports.RecipesService = RecipesService = __decorate([
     __param(1, (0, mongoose_1.InjectModel)(reviewRecipe_entity_1.ReviewRecipe.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
         mongoose_2.Model,
-        images_service_1.ImagesService,
+        aws_bucket_service_1.AwsBucketService,
         users_service_1.UsersService])
 ], RecipesService);
 //# sourceMappingURL=recipes.service.js.map
