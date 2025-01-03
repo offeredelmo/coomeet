@@ -9,7 +9,10 @@ async function bootstrap() {
   
   const configService = app.get(ConfigService);
   app.enableCors();
+  
+  //setGlobalPrefix: agrega a un el texto antes de cada ruta
   app.setGlobalPrefix('api/v1/');
+  
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

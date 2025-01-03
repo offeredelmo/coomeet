@@ -54,10 +54,10 @@ export class Recipe {
   @Prop()
   tags: string[]
 
-  @Prop()
+  @Prop({default:false})
   approved: boolean
 
-  @Prop()
+  @Prop({default:false})
   delete: boolean
 }
 

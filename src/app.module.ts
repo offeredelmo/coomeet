@@ -12,10 +12,14 @@ import { AwsBucketModule } from './aws-bucket/aws-bucket.module';
 
 @Module({
   imports: [
+
+    // Importamos el módulo ConfigModule de @nestjs/config para manejar las variables de configuración y entorno.
+    // ConfigModule es un módulo que permite cargar y gestionar configuraciones de la aplicación.
     ConfigModule.forRoot({
-      isGlobal: true,
-      load: [configuration],
-      envFilePath: '.env'
+      isGlobal: true, // Hace que el módulo de configuración esté disponible globalmente en toda la aplicación.
+      load: [configuration], // Permite cargar funciones personalizadas o archivos que contienen configuraciones específicas.
+      // En este caso, 'configuration' es una función que devuelve un objeto con las configuraciones de la aplicación.
+      envFilePath: '.env' // Especifica la ruta del archivo donde se encuentran las variables de entorno.
     }),
 
     MailerModule.forRootAsync({
@@ -34,13 +38,24 @@ import { AwsBucketModule } from './aws-bucket/aws-bucket.module';
         }),
       inject: [ConfigService],
     }),
+
+
+    // Importamos el módulo MongooseModule de @nestjs/mongoose para manejar la conexión con MongoDB.
+    // Se utiliza `forRootAsync` para configurar la conexión de forma asíncrona,
+    // lo que permite esperar las dependencias necesarias antes de establecer la conexión.
     MongooseModule.forRootAsync({
-      imports: [ConfigModule],
+      imports: [ConfigModule], // Importamos el módulo ConfigModule para acceder a las variables de entorno o configuraciones.
+
       useFactory: async (configService: ConfigService) => ({
+        // La función `useFactory` es una fábrica asíncrona que devuelve la configuración de conexión.
         uri: configService.get<string>('mongo_url_db'),
+        // `configService.get<string>('mongo_url_db')` obtiene la URL de conexión a MongoDB
+        // desde las variables de entorno a través del ConfigService.
       }),
-      inject: [ConfigService],
+      inject: [ConfigService], // Inyectamos el servicio ConfigService para poder acceder a las configuraciones.
     }),
+
+
     UsersModule,
     AuthModule,
     NodemailerModule,
