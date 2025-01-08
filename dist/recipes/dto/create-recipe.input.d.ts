@@ -10,6 +10,7 @@ export declare class CreateRecipeInput {
     title: string;
     preparation?: string[];
     ingredients: IngredientInput[];
+    time_preparation_in_minutes: number;
     url_youtube: string;
     tags: string[];
 }

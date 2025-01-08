@@ -1,6 +1,6 @@
 import { InputType, Int, Field, Float, ID } from '@nestjs/graphql';
 import { UnitOfMeasure } from '../entities/recipe.entity';
-import { IsArray, IsEnum, IsMongoId, isNotEmpty, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsEnum, IsMongoId, isNotEmpty, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { Types } from 'mongoose';
 
@@ -40,7 +40,12 @@ export class
   @IsArray()
   @Type(() => IngredientInput)
   ingredients: IngredientInput[];
-  
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsNumber()
+  time_preparation_in_minutes: number;
+
   @IsOptional()
   @IsNotEmpty()
   @IsString()

@@ -12,9 +12,14 @@ export declare class Recipe {
     key_img_url?: string;
     preparation: string[];
     ingredients: Ingredient[];
+    ingredients_quantity: number;
+    time_preparation_in_minutes: number;
     url_youtube: string;
-    user_id: Types.ObjectId;
+    dificult: string;
     tags: string[];
+    approved: boolean;
+    delete: boolean;
+    user_id: Types.ObjectId;
 }
 export type RecipeDocument = HydratedDocument<Recipe>;
 export declare const RecipeSchema: import("mongoose").Schema<Recipe, import("mongoose").Model<Recipe, any, any, any, import("mongoose").Document<unknown, any, Recipe> & Recipe & Required<{

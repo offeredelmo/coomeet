@@ -26,6 +26,7 @@ let RecipeController = class RecipeController {
     }
     async createRecipe(createRecipeInput) {
         console.log("entre en el metodo");
+        console.log(createRecipeInput);
         return await this.recipesService.createRecipe(createRecipeInput);
     }
     async updateRecipe(updateRecipeInput) {
@@ -33,10 +34,10 @@ let RecipeController = class RecipeController {
     }
     async addImgeToImage(_id, file) {
         console.log("entrooo");
-        return await this.recipesService.addImgeToImage(_id, file);
+        return await this.recipesService.addImgeToRecipe(_id, file);
     }
     async getRecipe(id) {
-        return await this.recipesService.getRecipe(id);
+        return await this.recipesService.getRecipeById(id);
     }
     async listMyRecipes(params) {
         console.log(params);
@@ -53,6 +54,12 @@ let RecipeController = class RecipeController {
     }
     async reviewRecipe(createReviewInput) {
         return await this.recipesService.reviewRecipe(createReviewInput);
+    }
+    async deleteRecipeById(_id) {
+        return await this.recipesService.deleteRecipeById(_id);
+    }
+    async approveRecipeById(_id) {
+        return await this.approveRecipeById(_id);
     }
 };
 exports.RecipeController = RecipeController;
@@ -121,6 +128,20 @@ __decorate([
     __metadata("design:paramtypes", [create_review_input_1.CreateReviewInput]),
     __metadata("design:returntype", Promise)
 ], RecipeController.prototype, "reviewRecipe", null);
+__decorate([
+    (0, common_1.Delete)(":id"),
+    __param(0, (0, common_1.Query)(":id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], RecipeController.prototype, "deleteRecipeById", null);
+__decorate([
+    (0, common_1.Patch)(":id"),
+    __param(0, (0, common_1.Query)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], RecipeController.prototype, "approveRecipeById", null);
 exports.RecipeController = RecipeController = __decorate([
     (0, common_1.Controller)("recipe"),
     __metadata("design:paramtypes", [recipes_service_1.RecipesService])

@@ -60,19 +60,39 @@ __decorate([
 ], Recipe.prototype, "ingredients", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Recipe.prototype, "ingredients_quantity", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Recipe.prototype, "time_preparation_in_minutes", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Recipe.prototype, "url_youtube", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ index: true, ref: "User" }),
-    __metadata("design:type", mongoose_2.Types.ObjectId)
-], Recipe.prototype, "user_id", void 0);
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Recipe.prototype, "dificult", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Array)
 ], Recipe.prototype, "tags", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: false }),
+    __metadata("design:type", Boolean)
+], Recipe.prototype, "approved", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: false }),
+    __metadata("design:type", Boolean)
+], Recipe.prototype, "delete", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ index: true, ref: "User" }),
+    __metadata("design:type", mongoose_2.Types.ObjectId)
+], Recipe.prototype, "user_id", void 0);
 exports.Recipe = Recipe = __decorate([
     (0, graphql_1.ObjectType)(),
-    (0, mongoose_1.Schema)()
+    (0, mongoose_1.Schema)({ timestamps: true })
 ], Recipe);
 exports.RecipeSchema = mongoose_1.SchemaFactory.createForClass(Recipe);
 var UnitOfMeasure;

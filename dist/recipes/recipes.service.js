@@ -32,15 +32,15 @@ let RecipesService = class RecipesService {
     async findById(_id) {
         const recipe = this.recipeModel.findById(_id);
         if (!recipe) {
-            throw new common_1.NotFoundException("no se a encontrado la receta");
+            throw new common_1.NotFoundException(`no se a encontrado la receta ${_id}`);
         }
         return recipe;
     }
     async createRecipe(createRecipeInput) {
-        const newRecipe = new this.recipeModel(createRecipeInput);
         await this.usersService.findById(createRecipeInput.user_id);
-        newRecipe.user_id = new mongodb_1.ObjectId(newRecipe.user_id);
-        console.log(newRecipe.save);
+        createRecipeInput.user_id = new mongodb_1.ObjectId(createRecipeInput.user_id);
+        const newRecipe = new this.recipeModel(createRecipeInput);
+        newRecipe.ingredients_quantity = createRecipeInput.ingredients.length;
         return await newRecipe.save();
     }
     async updateRecipe(updateRecipeInput) {
@@ -58,7 +58,7 @@ let RecipesService = class RecipesService {
             console.log(error);
         }
     }
-    async addImgeToImage(_id, file) {
+    async addImgeToRecipe(_id, file) {
         try {
             console.log(_id);
             console.log("hola");
@@ -78,7 +78,7 @@ let RecipesService = class RecipesService {
             throw new Error("Failed to add image to recipe. Please try again.");
         }
     }
-    async getRecipe(_id) {
+    async getRecipeById(_id) {
         const recipe = await this.recipeModel.findById(_id).populate({
             path: "user_id",
             model: "User",
@@ -91,42 +91,20 @@ let RecipesService = class RecipesService {
     }
     async listMyRecipes(id, page = 1, perPage = 20) {
         await this.usersService.findById(id);
+        const pageNum = Number(page);
+        const perPageNum = Number(perPage);
+        if (isNaN(pageNum) || isNaN(perPageNum)) {
+            throw new Error('Page and perPage deben de ser numeros validos');
+        }
         const recetas = await this.recipeModel.aggregate([
             {
                 '$match': {
-                    'user_id': '66d3bacdb06708e42f24149d'
+                    'user_id': new mongodb_1.ObjectId(id)
                 }
             }, {
-                '$lookup': {
-                    'from': 'reviewrecipes',
-                    'let': {
-                        'recipe_id': {
-                            '$toString': '$_id'
-                        }
-                    },
-                    'pipeline': [
-                        {
-                            '$match': {
-                                '$expr': {
-                                    '$eq': [
-                                        '$recipe_id', '$$recipe_id'
-                                    ]
-                                }
-                            }
-                        }, {
-                            '$project': {
-                                '_id': 1
-                            }
-                        }
-                    ],
-                    'as': 'reviews'
-                }
+                '$skip': 0
             }, {
-                '$addFields': {
-                    'review_count': {
-                        '$size': '$reviews'
-                    }
-                }
+                '$limit': 20
             }
         ]);
         return recetas;
@@ -135,6 +113,7 @@ let RecipesService = class RecipesService {
         const { page = 1, limit = 10 } = paginationDTO;
         const skip = (page - 1) * limit;
         const randomRecipes = await this.recipeModel.aggregate([
+            { $match: { "$approved": true } },
             { $sample: { size: 100 } },
             {
                 $lookup: {
@@ -216,6 +195,29 @@ let RecipesService = class RecipesService {
         catch (error) {
             console.error("Error en la búsqueda:", error.message);
             throw new Error("No se pudo realizar la búsqueda");
+        }
+    }
+    async deleteRecipeById(_id) {
+        try {
+            const recipe = await this.findById(_id);
+            recipe.approved = false;
+            recipe.delete = false;
+            await recipe.save();
+            return true;
+        }
+        catch (error) {
+            throw new Error(`a ocurrido un error inesperado ${error}`);
+        }
+    }
+    async approveRecipeById(_id) {
+        try {
+            const recipe = await this.findById(_id);
+            recipe.approved = true;
+            await recipe.save();
+            return true;
+        }
+        catch (error) {
+            throw new Error(`a ocurrido un error inesperado ${error}`);
         }
     }
 };

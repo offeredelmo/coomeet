@@ -1,4 +1,4 @@
-import { Controller, Body, Post, UseInterceptors, UploadedFile, Get, Param, Query, Patch } from "@nestjs/common";
+import { Controller, Body, Post, UseInterceptors, UploadedFile, Get, Param, Query, Patch, Delete } from "@nestjs/common";
 import { RecipesService } from "./recipes.service";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { CreateRecipeInput } from "./dto/create-recipe.input";
@@ -19,6 +19,7 @@ export class RecipeController {
         @Body() createRecipeInput: CreateRecipeInput,
     ) {
         console.log("entre en el metodo")
+        console.log(createRecipeInput)
         return await this.recipesService.createRecipe(createRecipeInput)
     }
 
@@ -37,13 +38,13 @@ export class RecipeController {
         @UploadedFile() file?: Express.Multer.File
     ) {
         console.log("entrooo")
-        return await this.recipesService.addImgeToImage(_id, file)
+        return await this.recipesService.addImgeToRecipe(_id, file)
     }
 
 
     @Get("recipe/:id")
     async getRecipe(@Param("id") id: string) {
-        return await this.recipesService.getRecipe(id)
+        return await this.recipesService.getRecipeById(id)
     }
 
     @Get("my-recipes/:id/:page/:perpage")
@@ -76,5 +77,15 @@ export class RecipeController {
     @Post("review")
     async reviewRecipe(@Body() createReviewInput: CreateReviewInput) {
         return await this.recipesService.reviewRecipe(createReviewInput)
+    }
+
+    @Delete(":id")
+    async deleteRecipeById(@Query(":id") _id: string) {
+        return await this.recipesService.deleteRecipeById(_id);
+    }
+
+    @Patch(":id")
+    async approveRecipeById(@Query("id") _id: string)  {
+        return await this.approveRecipeById(_id);
     }
 }

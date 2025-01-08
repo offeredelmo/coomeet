@@ -22,8 +22,8 @@ export declare class RecipesService {
     updateRecipe(updateRecipeInput: UpdateRecipeInput): Promise<import("mongoose").Document<unknown, {}, Recipe> & Recipe & Required<{
         _id: Types.ObjectId;
     }>>;
-    addImgeToImage(_id: string, file: Express.Multer.File): Promise<any>;
-    getRecipe(_id: string): Promise<import("mongoose").Document<unknown, {}, Recipe> & Recipe & Required<{
+    addImgeToRecipe(_id: string, file: Express.Multer.File): Promise<any>;
+    getRecipeById(_id: string): Promise<import("mongoose").Document<unknown, {}, Recipe> & Recipe & Required<{
         _id: Types.ObjectId;
     }>>;
     listMyRecipes(id: string, page?: number, perPage?: number): Promise<any[]>;
@@ -33,4 +33,6 @@ export declare class RecipesService {
     }>;
     listRecipeByTag(tag: string): Promise<any[]>;
     search(text: string): Promise<any[]>;
+    deleteRecipeById(_id: string): Promise<boolean>;
+    approveRecipeById(_id: string): Promise<boolean>;
 }

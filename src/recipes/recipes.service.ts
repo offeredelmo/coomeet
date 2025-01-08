@@ -23,23 +23,34 @@ export class RecipesService {
     private readonly usersService: UsersService
 
   ) { }
-
+  //FINDBYID: busca a una receta por _id, si la encuentra retorna la entidad, si no manda un error 
   async findById(_id) {
     const recipe = this.recipeModel.findById(_id)
     if (!recipe) {
-      throw new NotFoundException("no se a encontrado la receta")
+      throw new NotFoundException(`no se a encontrado la receta ${_id}`)
     }
     return recipe
   }
 
+  //CREATERECIPE: crear una receta sin la imagen ya que esta se agrega desde nu endpoint separado
   async createRecipe(createRecipeInput: CreateRecipeInput) {
-    const newRecipe = new this.recipeModel(createRecipeInput)
+    //Se busca el usuario para comprobar que existe
     await this.usersService.findById(createRecipeInput.user_id)
-    newRecipe.user_id = new ObjectId(newRecipe.user_id)
-    console.log(newRecipe.save)
+
+    //Se combierde un un objectId ya que llega como string 
+    createRecipeInput.user_id = new ObjectId(createRecipeInput.user_id)
+
+    //Se genera la entidad de receta
+    const newRecipe = new this.recipeModel(createRecipeInput)
+
+    //Se agrega el atributo de cantidad de ingresientes
+    newRecipe.ingredients_quantity = createRecipeInput.ingredients.length
+
+    //Se guarda la nueva entidad en la base de datos  y se retorna la entidad
     return await newRecipe.save()
   }
 
+  //UPDATERECIPE: 
   async updateRecipe(updateRecipeInput: UpdateRecipeInput) {
     try {
       console.log()
@@ -59,11 +70,15 @@ export class RecipesService {
     }
   }
 
-  async addImgeToImage(_id: string, file: Express.Multer.File) {
+  //ADDIMAGETORECIPE: Agrega una imagen a una receta, tambien funciona para actualizarla.
+  //Funcionamiento: 
+  // Recibe el _id de la recipe y unu archivo
+  // Sube la imagen aun bucket de s3 y retorna la url que es lo que se agrega a la receta
+  async addImgeToRecipe(_id: string, file: Express.Multer.File) {
     try {
       console.log(_id)
       console.log("hola")
-      const fileExtension = file.originalname.split(".").pop();
+      const fileExtension = file.originalname.split(".").pop();//Obtiene la extencion del archivo.
       const keyNameUrlImg = `${_id}.${fileExtension}`
       const urlImage = await this.awsBucketService.uploadImageAndReturnUrl(
         new UploadFileDto(
@@ -90,8 +105,8 @@ export class RecipesService {
 
 
   }
-
-  async getRecipe(_id: string) {
+  //GETRECIPE: Obtiene una receta por id
+  async getRecipeById(_id: string) {
     const recipe = await this.recipeModel.findById(_id).populate(
       {
         path: "user_id",
@@ -105,55 +120,39 @@ export class RecipesService {
     return recipe
   }
 
+  //LISTMYRECIPES: con el id del usuario se obtiene sus recetas creadas
   async listMyRecipes(id: string, page: number = 1, perPage: number = 20) {
-    await this.usersService.findById(id)
-    const recetas = await this.recipeModel.aggregate(
-      [
-        {
-          '$match': {
-            'user_id': '66d3bacdb06708e42f24149d'
-          }
-        }, {
-          '$lookup': {
-            'from': 'reviewrecipes',
-            'let': {
-              'recipe_id': {
-                '$toString': '$_id'
-              }
-            },
-            'pipeline': [
-              {
-                '$match': {
-                  '$expr': {
-                    '$eq': [
-                      '$recipe_id', '$$recipe_id'
-                    ]
-                  }
-                }
-              }, {
-                '$project': {
-                  '_id': 1
-                }
-              }
-            ],
-            'as': 'reviews'
-          }
-        }, {
-          '$addFields': {
-            'review_count': {
-              '$size': '$reviews'
-            }
-          }
+    // Verifica si el usuario existe
+    await this.usersService.findById(id);
+
+    // Asegúrate de convertir `page` y `perPage` a números
+    const pageNum = Number(page);
+    const perPageNum = Number(perPage);
+
+    if (isNaN(pageNum) || isNaN(perPageNum)) {
+      throw new Error('Page and perPage deben de ser numeros validos');
+    }
+
+    const recetas = await this.recipeModel.aggregate([
+      {
+        '$match': {
+          'user_id': new ObjectId(id)
         }
-      ]
-    )
-    return recetas
+      }, {
+        '$skip': 0
+      }, {
+        '$limit': 20
+      }
+    ]);
+    return recetas;
   }
 
+  //LISTRECIPERANDOM: retorna una lista de recipes obtenidad de forma aleatoria
   async listRecipeRandom(paginationDTO: PaginationDTO) {
     const { page = 1, limit = 10 } = paginationDTO
     const skip = (page - 1) * limit;
     const randomRecipes = await this.recipeModel.aggregate([
+      { $match: { "$approved": true } },
       { $sample: { size: 100 } },  // Primero, selecciona 100 recetas aleatorias
       {
         $lookup: {
@@ -184,8 +183,8 @@ export class RecipesService {
     console.log(randomRecipes)
     return randomRecipes;
   }
-  async reviewRecipe(createReviewInput: CreateReviewInput) {
 
+  async reviewRecipe(createReviewInput: CreateReviewInput) {
     const oldReview = await this.recipeReviewModel.findOne(
       {
         user_id: createReviewInput.user_id,
@@ -242,6 +241,29 @@ export class RecipesService {
     } catch (error) {
       console.error("Error en la búsqueda:", error.message);
       throw new Error("No se pudo realizar la búsqueda");
+    }
+  }
+
+  async deleteRecipeById(_id: string) {
+    try {
+      const recipe = await this.findById(_id);
+      recipe.approved = false
+      recipe.delete = false
+      await recipe.save()
+      return true
+    } catch (error) {
+      throw new Error(`a ocurrido un error inesperado ${error}`)
+    }
+  }
+
+  async approveRecipeById(_id: string) {
+    try {
+      const recipe = await this.findById(_id);
+      recipe.approved = true
+      await recipe.save()
+      return true
+    } catch (error) {
+      throw new Error(`a ocurrido un error inesperado ${error}`)
     }
   }
 

@@ -46,19 +46,28 @@ export class Recipe {
   ingredients: Ingredient[];
 
   @Prop()
+  ingredients_quantity: number
+  
+  @Prop()
+  time_preparation_in_minutes: number
+
+  @Prop()
   url_youtube: string
 
-  @Prop({ index: true, ref: "User" })
-  user_id: Types.ObjectId
+  @Prop()
+  dificult: string
 
   @Prop()
   tags: string[]
 
-  @Prop({default:false})
+  @Prop({ default: false })
   approved: boolean
 
-  @Prop({default:false})
+  @Prop({ default: false })
   delete: boolean
+
+  @Prop({ index: true, ref: "User" })
+  user_id: Types.ObjectId
 }
 
 export type RecipeDocument = HydratedDocument<Recipe>;

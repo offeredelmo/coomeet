@@ -23,4 +23,6 @@ export declare class RecipeController {
     reviewRecipe(createReviewInput: CreateReviewInput): Promise<import("mongoose").Document<unknown, {}, import("./entities/reviewRecipe.entity").ReviewRecipe> & import("./entities/reviewRecipe.entity").ReviewRecipe & {
         _id: import("mongoose").Types.ObjectId;
     }>;
+    deleteRecipeById(_id: string): Promise<boolean>;
+    approveRecipeById(_id: string): any;
 }
